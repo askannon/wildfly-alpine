@@ -6,9 +6,9 @@ env | sort
 echo "========================================================================="
 
 # add portential statup delays
-ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djava.security.egd=file:/dev/./urandom $(/jolokia_opts.sh)";
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djava.security.egd=file:/dev/./urandom";
 # add Jolokia Agent options
-ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS $(/jolokia_opts.sh)";
+#ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS $(/jolokia_opts.sh)";
 
 if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   if [[ -z $GOSSIP_ROUTERS ]]; then
@@ -20,5 +20,8 @@ if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   fi
 fi
 
-exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh $ADDL_JAVA_OPTS -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml}
+if [[ $JOLOKIA_OFF ]]; then
+  touch $JBOSS_HOME/standalone/deployments/jolokia.war.skipdeploy
+fi
 
+exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml} $ADDL_JAVA_OPTS

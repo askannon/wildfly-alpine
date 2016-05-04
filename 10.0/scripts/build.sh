@@ -18,7 +18,8 @@ apk add --update \
   bash \
   tcpdump \
   lsof \
-  ngrep
+  ngrep \
+  unzip
 
 # install the S6 overlay
 curl -L https://github.com/just-containers/s6-overlay/releases/download/v$S6_VERSION/s6-overlay-amd64.tar.gz | tar xz -C /
@@ -65,8 +66,7 @@ done
 
 # install jolokia agent
 mkdir -p /opt/jolokia
-curl -L http://central.maven.org/maven2/org/jolokia/jolokia-jvm/$JOLOKIA_VERSION/jolokia-jvm-$JOLOKIA_VERSION-agent.jar -o $JOLOKIA_DIR/jolokia.jar
-
+curl -L http://central.maven.org/maven2/org/jolokia/jolokia-war/$JOLOKIA_VERSION/jolokia-war-$JOLOKIA_VERSION.war -o $JBOSS_HOME/standalone/deployments/jolokia.war
 
 # manage run as user/group
 addgroup -g $WILDFLY_GID $WILDFLY_GROUP
