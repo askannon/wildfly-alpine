@@ -21,7 +21,5 @@ COPY scripts/run.sh /run.sh
 RUN chmod 755 build.sh run.sh
 RUN /build.sh
 
-ADD http.war /opt/jboss/wildfly/standalone/deployments/
-
 ENTRYPOINT [ "/init" ]
 CMD ["/run.sh"]

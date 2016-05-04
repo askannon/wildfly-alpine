@@ -18,8 +18,7 @@ apk add --update \
   bash \
   tree \
   tcpdump \
-  lsof \
-  ngrep
+  lsof
 
 curl -L https://github.com/just-containers/s6-overlay/releases/download/v$S6_VERSION/s6-overlay-amd64.tar.gz | tar xz -C /
 
