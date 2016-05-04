@@ -20,6 +20,8 @@ fi
 
 if [[ $JOLOKIA_OFF ]]; then
   touch $JBOSS_HOME/standalone/deployments/jolokia.war.skipdeploy
+else
+  touch $JBOSS_HOME/standalone/deployments/jolokia.war.dodeploy
 fi
 
 exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml} $ADDL_JAVA_OPTS
