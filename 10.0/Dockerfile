@@ -8,7 +8,6 @@ ENV WILDFLY_VERSION="10.0.0.Final" \
     S6_VERSION="1.17.1.1" \
     JBOSS_HOME="/opt/wildfly" \
     JAVA_HOME="/usr/lib/jvm/default-jvm" \
-	JOLOKIA_DIR="/opt/jolokia" \
 	JOLOKIA_VERSION="1.3.3"
 
 ONBUILD ADD jboss-cli /opt/jboss-cli/
@@ -17,11 +16,13 @@ ONBUILD ADD jboss-deployments $JBOSS_HOME/standalone/deployments/
 ONBUILD RUN /build.sh jboss-cli-only
 
 # Expose the ports we're interested in
-EXPOSE 8080 8009 9990 8778
+EXPOSE 8080 8009 9990
 
 ADD scripts /
-RUN chmod 755 /build.sh /run.sh /jolokia_opts.sh
+RUN chmod 755 /build.sh /run.sh
 RUN /build.sh
+
+ADD jolokia-web.xml $JBOSS_HOME/standalone/deployments/jolokia.war/WEB-INF/
 
 ENTRYPOINT [ "/init" ]
 CMD ["/run.sh"]
