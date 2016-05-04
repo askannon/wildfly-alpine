@@ -14,11 +14,10 @@ apk update
 apk upgrade
 apk add --update \
   curl \
-  wget \
   bash \
-  tree \
   tcpdump \
-  lsof
+  lsof \
+  ngrep
 
 curl -L https://github.com/just-containers/s6-overlay/releases/download/v$S6_VERSION/s6-overlay-amd64.tar.gz | tar xz -C /
 
@@ -26,8 +25,6 @@ mkdir -p /opt/jboss /opt/jboss-cli
 curl https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar xz -C /opt/jboss
 cd /opt/jboss
 ln -s wildfly-$WILDFLY_VERSION wildfly
-
-/opt/jboss/wildfly/bin/add-user.sh admin masergy --silent
 
 cd /opt/jboss/wildfly/standalone/configuration/
 

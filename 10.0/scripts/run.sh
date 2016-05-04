@@ -14,5 +14,5 @@ if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   fi
 fi
 
-exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh $HA_OPTIONS -Djava.security.egd=file:/dev/./urandom -Djboss.node.name=$HOSTNAME -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml}
+exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh $HA_OPTIONS -Djava.security.egd=file:/dev/./urandom -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml}
 
