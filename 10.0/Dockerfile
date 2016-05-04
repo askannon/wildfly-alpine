@@ -17,7 +17,7 @@ ONBUILD ADD jboss-deployments $JBOSS_HOME/standalone/deployments/
 ONBUILD RUN /build.sh jboss-cli-only
 
 # Expose the ports we're interested in
-EXPOSE 8080 8009 9990
+EXPOSE 8080 8009 9990 8778
 
 ADD scripts /
 RUN chmod 755 /build.sh /run.sh /jolokia_opts.sh
