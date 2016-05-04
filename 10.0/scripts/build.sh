@@ -21,12 +21,12 @@ apk add --update \
 
 curl -L https://github.com/just-containers/s6-overlay/releases/download/v$S6_VERSION/s6-overlay-amd64.tar.gz | tar xz -C /
 
-mkdir -p /opt/jboss /opt/jboss-cli
-curl https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar xz -C /opt/jboss
-cd /opt/jboss
+mkdir -p $JBOSS_HOME /opt/jboss-cli
+curl https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar xz -C /opt
+cd /opt
 ln -s wildfly-$WILDFLY_VERSION wildfly
 
-cd /opt/jboss/wildfly/standalone/configuration/
+cd $JBOSS_HOME/standalone/configuration/
 
 for configfile in `ls standalone*.xml`; do
   $JBOSS_HOME/bin/jboss-cli.sh <<- _EOF_
@@ -61,6 +61,6 @@ done
 
 addgroup -g $WILDFLY_GID $WILDFLY_GROUP
 adduser -D -G $WILDFLY_GROUP -s /bin/false -u $WILDFLY_UID $WILDFLY_USER
-chown -R $WILDFLY_USER:$WILDFLY_GROUP $JBOSS_HOME /opt/jboss/wildfly-$WILDFLY_VERSION
+chown -R $WILDFLY_USER:$WILDFLY_GROUP $JBOSS_HOME /opt/wildfly-$WILDFLY_VERSION
 
 rm -rf /tmp/* /var/cache/apk/*
