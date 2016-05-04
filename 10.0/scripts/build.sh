@@ -37,6 +37,10 @@ for configfile in `ls standalone*.xml`; do
   $JBOSS_HOME/bin/jboss-cli.sh <<- _EOF_
     embed-server --server-config=${configfile}
     /subsystem=transactions/:write-attribute(name=node-identifier,value="\${jboss.node.name}")
+	/subsystem=undertow/server=default-server/host=default-host/filter-ref=server-header:remove()
+	/subsystem=undertow/server=default-server/host=default-host/filter-ref=x-powered-by-header:remove()
+	/subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=proxy-address-forwarding,value=true)
+	/subsystem=undertow/server=default-server/http-listener=default:undefine-attribute(name=redirect-socket)
 _EOF_
 done
 
@@ -60,6 +64,8 @@ for configfile in `ls standalone*ha.xml`; do
     /subsystem=jgroups/stack=tunnel/transport=TRANSPORT/property=gossip_router_hosts:add(value="\${jgroups.gossip_router_hosts}")
     /subsystem=jgroups/channel=ee:write-attribute(name=stack,value=tunnel)
     /subsystem=logging/logger=org.jgroups/:add(category=org.jgroups,level=DEBUG)
+	/subsystem=infinispan/cache-container=web/distributed-cache=dist/transaction=TRANSACTION:add(locking=OPTIMISTIC)
+	/subsystem=infinispan/cache-container=web/distributed-cache=dist/locking=LOCKING:add(isolation=READ_COMMITTED)
     run-batch
 _EOF_
 done
