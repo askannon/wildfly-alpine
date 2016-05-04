@@ -22,7 +22,7 @@ ADD scripts /
 RUN chmod 755 /build.sh /run.sh
 RUN /build.sh
 
-ADD jolokia-web.xml $JBOSS_HOME/standalone/deployments/jolokia.war/WEB-INF/
+ADD jolokia-web.xml $JBOSS_HOME/standalone/deployments/jolokia.war/WEB-INF/web.xml
 
 ENTRYPOINT [ "/init" ]
 CMD ["/run.sh"]

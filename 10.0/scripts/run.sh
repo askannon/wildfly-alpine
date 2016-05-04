@@ -5,10 +5,8 @@ echo "========================================================================="
 env | sort
 echo "========================================================================="
 
-# add portential statup delays
+# add potential statup delays due to broken /deb/random
 ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djava.security.egd=file:/dev/./urandom";
-# add Jolokia Agent options
-#ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS $(/jolokia_opts.sh)";
 
 if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   if [[ -z $GOSSIP_ROUTERS ]]; then

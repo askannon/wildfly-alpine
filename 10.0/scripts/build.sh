@@ -66,7 +66,7 @@ done
 
 # install jolokia agent
 curl -L http://central.maven.org/maven2/org/jolokia/jolokia-war/$JOLOKIA_VERSION/jolokia-war-$JOLOKIA_VERSION.war -o /tmp/jolokia.war
-unzip /tmp/jolokia.war -d $JBOSS_HOME/standalone/deployments/
+unzip /tmp/jolokia.war -d $JBOSS_HOME/standalone/deployments/jolokia.war
 
 # manage run as user/group
 addgroup -g $WILDFLY_GID $WILDFLY_GROUP
