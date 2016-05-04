@@ -1,18 +1,24 @@
 #!/usr/bin/env bash
 
-echo "Environment:"
-echo "======================"
+echo "OS Environment:"
+echo "========================================================================="
 env | sort
-echo "======================"
+echo "========================================================================="
+
+# add portential statup delays
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djava.security.egd=file:/dev/./urandom $(/jolokia_opts.sh)";
+# add Jolokia Agent options
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS $(/jolokia_opts.sh)";
 
 if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   if [[ -z $GOSSIP_ROUTERS ]]; then
-    echo "If you are using a HA configuration you also have to define a 'GOSSIP_ROUTERS' variabel that contains the connection string"
+    echo "If you are using an HA configuration you also have to define a 'GOSSIP_ROUTERS' variabel that contains the connection string (e.g. GOSSIP_ROUTERS=\"10.20.120.2[12001],10.20.120.2[12001]\""
     exit 1
   else
-    HA_OPTIONS="-Djgroups.gossip_router_hosts=$GOSSIP_ROUTERS"
+    # add the gossip routers
+    ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djgroups.gossip_router_hosts=$GOSSIP_ROUTERS"
   fi
 fi
 
-exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh $HA_OPTIONS -Djava.security.egd=file:/dev/./urandom -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml}
+exec s6-applyuidgid -u 1000 -g 1000 $JBOSS_HOME/bin/standalone.sh $ADDL_JAVA_OPTS -Djboss.node.name=${NODE_NAME:-$HOSTNAME} -b $(hostname -i) -bmanagement $(hostname -i) -c ${CONFIG_FILE:-standalone.xml}
 

@@ -10,6 +10,7 @@ if [ $# -eq 1 ] && [ "$1" = "jboss-cli-only" ]; then
   exit 0
 fi
 
+# get some additional alpine packages
 apk update
 apk upgrade
 apk add --update \
@@ -19,13 +20,16 @@ apk add --update \
   lsof \
   ngrep
 
+# install the S6 overlay
 curl -L https://github.com/just-containers/s6-overlay/releases/download/v$S6_VERSION/s6-overlay-amd64.tar.gz | tar xz -C /
 
+# install WildFly
 mkdir -p /opt/jboss-cli
 curl https://download.jboss.org/wildfly/$WILDFLY_VERSION/wildfly-$WILDFLY_VERSION.tar.gz | tar xz -C /opt
 cd /opt
 ln -s wildfly-$WILDFLY_VERSION wildfly
 
+# process some default configuration settings
 cd $JBOSS_HOME/standalone/configuration/
 
 for configfile in `ls standalone*.xml`; do
@@ -59,8 +63,15 @@ for configfile in `ls standalone*ha.xml`; do
 _EOF_
 done
 
+# install jolokia agent
+mkdir -p /opt/jolokia
+curl -L http://central.maven.org/maven2/org/jolokia/jolokia-jvm/$JOLOKIA_VERSION/jolokia-jvm-$JOLOKIA_VERSION-agent.jar -o $JOLOKIA_DIR/jolokia.jar
+
+
+# manage run as user/group
 addgroup -g $WILDFLY_GID $WILDFLY_GROUP
 adduser -D -G $WILDFLY_GROUP -s /bin/false -u $WILDFLY_UID $WILDFLY_USER
 chown -R $WILDFLY_USER:$WILDFLY_GROUP $JBOSS_HOME /opt/wildfly-$WILDFLY_VERSION
 
+# cleanup
 rm -rf /tmp/* /var/cache/apk/*
