@@ -8,7 +8,8 @@ ENV WILDFLY_VERSION="10.0.0.Final" \
     S6_VERSION="1.17.2.0" \
     JBOSS_HOME="/opt/wildfly" \
     JOLOKIA_VERSION="1.3.3" \
-    JOLOKIA_ENABLED="true"
+    JOLOKIA_ENABLED="true" \
+    JBOSS_LOG_MNGR_EXT_VERSION="1.0.0.Alpha3"
 
 ONBUILD ADD jboss-cli /opt/jboss-cli/
 ONBUILD ADD jboss-modules $JBOSS_HOME/modules/

@@ -8,6 +8,13 @@ echo "========================================================================="
 # eliminate potential statup delays due to broken /dev/random
 ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Djava.security.egd=file:/dev/./urandom";
 
+# set logging options
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Dlogging.root.level=${LOG_ROOT_LEVEL:-DEBUG}"
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Dlogging.file.level=${LOG_FILE_LEVEL:-INFO} -Dlogging.file.formatter=${LOG_FILE_FORMATTER:-PATTERN}"
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Dlogging.console.level=${LOG_CONSOLE_LEVEL:-INFO} -Dlogging.console.formatter=${LOG_CONSOLE_FORMATTER:-COLOR-PATTERN}"
+ADDL_JAVA_OPTS="$ADDL_JAVA_OPTS -Dlogging.socket.enabled=${LOG_SOCKET_ENABLED:-false} -Dlogging.socket.level=${LOG_SOCKET_LEVEL:-INFO} -Dlogging.socket.formatter=${LOG_SOCKET_FORMATTER:-JSON} -Dlogging.socket.hostname=${LOG_SOCKET_HOSTNAME:-localhost} -Dlogging.socket.port=${LOG_SOCKET_PORT:-8000}"
+
+
 if [[ ${CONFIG_FILE} ]] && [[ ${CONFIG_FILE} == *ha.xml ]]; then
   if [[ -z $GOSSIP_ROUTERS ]]; then
     echo "If you are using an HA configuration you also have to define a 'GOSSIP_ROUTERS' variabel that contains the connection string (e.g. GOSSIP_ROUTERS=\"10.20.120.2[12001],10.20.120.2[12001]\""

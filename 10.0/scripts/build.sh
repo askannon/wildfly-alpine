@@ -37,6 +37,25 @@ ln -s wildfly-$WILDFLY_VERSION wildfly
 # process some default configuration settings
 cd $JBOSS_HOME/standalone/configuration/
 
+# add the jboss-logmanager-ext module
+mkdir -p $JBOSS_HOME/modules/org/jboss/logmanager/ext/main
+curl -L https://repository.jboss.org/nexus/service/local/repositories/releases/content/org/jboss/logmanager/jboss-logmanager-ext/$JBOSS_LOG_MNGR_EXT_VERSION/jboss-logmanager-ext-$JBOSS_LOG_MNGR_EXT_VERSION.jar -o $JBOSS_HOME/modules/org/jboss/logmanager/ext/main/jboss-logmanager-ext-$JBOSS_LOG_MNGR_EXT_VERSION.jar
+
+cat >$JBOSS_HOME/modules/org/jboss/logmanager/ext/main/module.xml << _EOF_
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.0" name="org.jboss.logmanager.ext">
+  <resources>
+    <resource-root path="jboss-logmanager-ext-${JBOSS_LOG_MNGR_EXT_VERSION}.jar"/>
+  </resources>
+  <dependencies>
+    <module name="javax.api"/>
+    <module name="org.jboss.logmanager"/>
+    <module name="javax.json.api"/>
+    <module name="javax.xml.stream.api"/>
+  </dependencies>
+</module>
+_EOF_
+
 # this applys to all config files
 for configfile in `ls standalone*.xml`; do
   $JBOSS_HOME/bin/jboss-cli.sh <<- _EOF_
@@ -46,6 +65,20 @@ for configfile in `ls standalone*.xml`; do
     /subsystem=undertow/server=default-server/host=default-host/filter-ref=x-powered-by-header:remove()
     /subsystem=undertow/server=default-server/http-listener=default:write-attribute(name=proxy-address-forwarding,value=true)
     /subsystem=undertow/server=default-server/http-listener=default:undefine-attribute(name=redirect-socket)
+    # Set root logging level to env var
+    /subsystem=logging/root-logger=ROOT:write-attribute(name=level,value=\${logging.root.level})
+    # Add a JSON formatter
+    /subsystem=logging/custom-formatter=JSON:add(class=org.jboss.logmanager.ext.formatters.JsonFormatter,module=org.jboss.logmanager.ext)
+    # Add a socket handler with JSON formatting
+    /subsystem=logging/custom-handler=SOCKET:add(enabled=\${logging.socket.enabled},level=\${logging.socket.level},class=org.jboss.logmanager.ext.handlers.SocketHandler,module=org.jboss.logmanager.ext,named-formatter=JSON,properties={hostname=\${logging.socket.hostname}, port=\${logging.socket.port}})
+    # Add the new handler to the root-logger
+    /subsystem=logging/root-logger=ROOT:add-handler(name=SOCKET)
+    # Set file handler to log env var formatted
+    /subsystem=logging/periodic-rotating-file-handler=FILE:write-attribute(name=named-formatter,value=\${logging.file.formatter})
+    /subsystem=logging/periodic-rotating-file-handler=FILE:write-attribute(name=level,value=\${logging.file.level})
+    # Set console handler to log env variable formatter
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=named-formatter,value=\${logging.console.formatter})
+    /subsystem=logging/console-handler=CONSOLE:write-attribute(name=level,value=\${logging.console.level})
 _EOF_
 done
 
